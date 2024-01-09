@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.chainsys.library.dao.UserRegisterDAO;
+import com.chainsys.library.model.UserRegister;
+import com.chainsys.library.validation.RegisterValid;
 
 @Controller
 public class UserController {
@@ -17,6 +19,8 @@ public class UserController {
 
 	@Autowired
 	UserRegisterDAO userRegisterdao;
+	
+	RegisterValid registerValid = new RegisterValid();
 	@RequestMapping("/")
 	public String home() {
 		return  "home.html";
@@ -25,7 +29,23 @@ public class UserController {
 	@GetMapping("/addUser")
 	public String addUser(@RequestParam("username") String userName,@RequestParam("cpassword") String confirmPassword,
 			@RequestParam("email") String email,@RequestParam("password") String password) {
-		userRegisterdao.saveUser(userName, confirmPassword, email, password);
-		return "register.html";
+		UserRegister userRegister = new UserRegister();
+		userRegister.setUserName(userName);
+		userRegister.setConfirmPassword(confirmPassword);
+		userRegister.setEmail(email);
+		userRegister.setPassword(password);
+		
+		boolean userValid = registerValid.isValid(userRegister);
+		
+		if (userValid == true) {
+			System.out.println("Register Valid");
+			userRegisterdao.saveUser(userRegister);
+			return "register.html";
+		} else {
+			System.out.println("Register Not Valid");
+            return "registerValid.html";
+            
+		}
+		
 	}
 }
