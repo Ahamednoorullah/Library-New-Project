@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.chainsys.library.dao.UserRegisterDAO;
+import com.chainsys.library.dao.UserRegisterDaoImpl;
 import com.chainsys.library.model.UserRegister;
 import com.chainsys.library.validation.RegisterValid;
 
@@ -18,7 +18,7 @@ public class UserController {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	UserRegisterDAO userRegisterdao;
+	UserRegisterDaoImpl userRegisterdao;
 	
 	RegisterValid registerValid = new RegisterValid();
 	@RequestMapping("/")
