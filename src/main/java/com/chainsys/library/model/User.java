@@ -1,13 +1,24 @@
 package com.chainsys.library.model;
 
-public class UserRegister {
 
-	private String email;
+
+public class User {
+
+	
+	
 	private String userName;
+	private String email;
 	private String password;
 	private String confirmPassword;
 	
 	
+	public User(String email, String userName, String password, String confirmPassword) {
+		super();
+		this.email = email;
+		this.userName = userName;
+		this.password = password;
+		this.confirmPassword = confirmPassword;
+	}
 	public String getEmail() {
 		return email;
 	}
