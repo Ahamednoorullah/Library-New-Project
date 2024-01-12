@@ -11,6 +11,9 @@ public class User {
 	private String password;
 	private String confirmPassword;
 	
+	public User() {
+		
+	}
 	
 	public User(String email, String userName, String password, String confirmPassword) {
 		super();
@@ -42,6 +45,12 @@ public class User {
 	}
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
+	}
+
+	@Override
+	public String toString() {
+		return "User [userName=" + userName + ", email=" + email + ", password=" + password + ", confirmPassword="
+				+ confirmPassword + "]";
 	}
 	
 }

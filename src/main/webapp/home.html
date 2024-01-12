@@ -6,5 +6,26 @@
 	<body>
 		<h1>WelCome To My Page</h1>
 		<a href="register.html">Register</a>
+		
+		<form action="/findbyuser" method="get">
+			<label for="email">Search Email</label>
+			<input type="email" name="email">
+			<br>
+			<button type="submit">Search</button>
+		</form>
+		
+		<form action="/updateuser" method="get">
+			<label for="email">Search Email</label>
+			<input type="email" name="email">
+			<br>
+			<button type="submit">Update</button>
+		</form>
+		
+		<form action="/deletedata" method="get">
+			<label for="email">Search Email</label>
+			<input type="email" name="email">
+			<br>
+			<button type="submit">Delete</button>
+		</form>
 	</body>
 </html>

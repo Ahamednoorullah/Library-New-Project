@@ -1,5 +1,7 @@
 package com.chainsys.library.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -60,5 +62,49 @@ public class UserController {
             
 		}
 		
+	}
+	@GetMapping("/listusers")
+	public String getAllUsers(Model model) {
+		List<User> users = userRegisterdao.userList();
+		System.out.println(users);
+		model.addAttribute("USER_LIST", users);
+		return "listusers.jsp";
+	}
+	@GetMapping("/findbyuser")
+	public String findOneUser(@RequestParam("email") String email,Model model) {
+		User user = userRegisterdao.findOne(email);
+		System.out.println("User OneRecord Found :"+user);
+		model.addAttribute("userFound", user);
+		return "findbyuser.jsp";
+	}
+	
+	@GetMapping("/updateuser")
+	public String update(@RequestParam("email") String email,Model model) {
+		User user = userRegisterdao.findOne(email);
+		System.out.println("User OneRecord Found :"+user);
+		model.addAttribute("userFound", user);
+		return "updateuser.jsp";
+	}
+	@GetMapping("/updatedata")
+	public String updateData(@RequestParam("username") String userName,@RequestParam("email") String email,
+			@RequestParam("password") String password,@RequestParam("cnfpassword") String confimPassword,Model model) {
+		User user = new User();
+		user.setUserName(userName);
+		user.setEmail(email);
+		user.setPassword(password);
+		user.setConfirmPassword(confimPassword);
+		int updateRows = userRegisterdao.update(user);
+		Model addAttribute = model.addAttribute(updateRows);
+		model.addAttribute("USER_LIST", user);
+		return "redirect:listusers";
+	}
+	@GetMapping("/deletedata")
+	public String deleteData(@RequestParam("email") String email,Model model) {
+//		User user = userRegisterdao.findOne(email);
+		User user = new User();
+		int deleteRows = userRegisterdao.delete(email);
+		Model addAttribute = model.addAttribute(deleteRows);
+		model.addAttribute("USER_LIST", user);
+		return "redirect:listusers";
 	}
 }
