@@ -11,17 +11,16 @@ public class userValid {
 		String userName  = user.getUserName();
 		String email = user.getEmail();
 		String password = user.getPassword();
-		String confirmPassword = user.getConfirmPassword();
+		String phoneNumber = user.getPhoneNumber();
 		
-		System.out.println(userName+"  "+email+" "+password+" " +confirmPassword );
+		System.out.println(userName+"  "+email+" "+password);
 		
 		boolean nameValidation = userNameValid(userName);
 		boolean emailValidation =emailValid(email);
 		boolean passwordValidation = passwordValid(password);
-		boolean confirmPasswordValidation = confirmPasswordValid(confirmPassword,password);
 		
 		if ((nameValidation == true)&&(emailValidation == true)&&
-				(passwordValidation == true)&&(confirmPasswordValidation == true)) {
+				(passwordValidation == true)) {
 			
 			return true;
 		} else {
@@ -71,13 +70,5 @@ public class userValid {
 		
 	}
 	
-	//ConfirmPassword Validation
-	private boolean confirmPasswordValid(String confirmPassword,String password) {
-		if ((confirmPassword != "")&&(confirmPassword != null)&&(confirmPassword.contentEquals(password))) {
-			return true;
-		} else {
-			return false;
-		}
-		
-	}
+	
 }
