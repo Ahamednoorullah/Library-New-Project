@@ -6,15 +6,12 @@
         <h3><i class="fa-solid fa-book"></i> Library BookWebsite</h3>
     </div>
     <div class="col-md-6">
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search"  aria-label="Search">
-            <button class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
-          </form>
+      
     </div>
 
     <div class="col-md-3">
-        <span class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Admin<span>
-          <a href="adminHome.jsp">Back</a>
+          <a href="" class="btn btn-success"><i class="fa-solid fa-user-plus"></i> Admin Ahamed</a>
+          <a href="login.jsp" class="btn btn-primary"><i class="fa-solid fa-right-to-bracket"></i></i> Logout</a>
     </div>
 </div>
 

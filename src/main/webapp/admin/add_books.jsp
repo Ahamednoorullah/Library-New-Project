@@ -16,6 +16,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="text-center">Add Books</h4>
+                        <h5 class="text-center text-success">${bookAdd}</h5>
+                        <h5 class="text-center text-danger">${bookNotAdd}</h5>
+
                         <form action="/addBook" method="get" id="formBook">
                            
                             <div class="form-group">
@@ -38,8 +41,8 @@
                                 <select  class="form-control" id="bookCategory" name="bookCategory">
                                     <option selected>---Select---</option>
                                     <option value="NewArrival">New Arrival</option>
-                                    <option value="bestSeller">Best Seller</option>
-                                    <option value="kids">Kids</option>
+                                    <option value="comics">Comics</option>
+                                    <option value="historical">Historical</option>
                                 </select>
                             </div>
 

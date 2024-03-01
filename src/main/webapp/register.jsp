@@ -16,6 +16,8 @@
                 <div class="card">
                     <div class="card-body">
                               <h4 class="text-center">Registration Form</h4>
+                              <h5 class="text-center text-success">${success}</h5>
+                              <h5 class="text-center text-danger">${failed}</h5>
                         <form id="form" action="/addUser" method="get">
                             <div class="form-group">
                                 <label for="inputName">Enter Name</label>

@@ -1,5 +1,6 @@
 package com.chainsys.library.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.chainsys.library.dao.AdminDaoImpl;
 import com.chainsys.library.dao.UserDaoImpl;
 import com.chainsys.library.model.Books;
+import com.chainsys.library.model.Cart;
+import com.chainsys.library.model.Order;
 import com.chainsys.library.model.User;
-import com.chainsys.library.validation.userValid;
+import com.chainsys.library.validation.BookValid;
+import com.chainsys.library.validation.UserValid;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class UserController {
@@ -31,17 +37,35 @@ public class UserController {
 	@Autowired
 	AdminDaoImpl admindaoImpl;
 	
-	userValid userValid = new userValid();
+	
+	UserValid userValid = new UserValid();
+	
+
+	BookValid bookValid = new BookValid();
 	@RequestMapping("/home")
 	public String home(Model model) {
 		List<Books> newBooks = userdao.newBook();
-		List<Books> bestBooks = userdao.bestBook();
-		List<Books> kidsBooks = userdao.kidsBook();
-		System.out.println(newBooks);
+		List<Books> comicsBooks = userdao.comicsBook();
+		List<Books> historicalBooks = userdao.historicalBook();
+//		System.out.println(newBooks);
 		model.addAttribute("newBook", newBooks);
-		model.addAttribute("bestBook", bestBooks);
-		model.addAttribute("kidsBook", kidsBooks);
+		model.addAttribute("comicsBook", comicsBooks);
+		model.addAttribute("historicalBook", historicalBooks);
 		return  "index.jsp";
+	}
+	
+	@RequestMapping("/userHome")
+	public String userHome(Model model,@RequestParam("uid") int id) {
+		User user = userdao.findOne(id);
+		model.addAttribute("userobj", user);
+		List<Books> newBooks = userdao.newBook();
+		List<Books> comicsBooks = userdao.comicsBook();
+		List<Books> historicalBooks = userdao.historicalBook();
+//		System.out.println(newBooks);
+		model.addAttribute("newBook", newBooks);
+		model.addAttribute("comicsBook", comicsBooks);
+		model.addAttribute("historicalBook", historicalBooks);
+		return  "userHome.jsp";
 	}
 	@RequestMapping("/reg")
 	public String register() {
@@ -49,57 +73,78 @@ public class UserController {
 	}
 	
 	@GetMapping("/addUser")
-	public String addUser(User user) {
-//	public String addUser(@RequestParam("username") String userName,@RequestParam("cpassword") String confirmPassword,
-//			@RequestParam("email") String email,@RequestParam("password") String password) {
-//		UserRegister userRegister = new UserRegister();
-//		userRegister.setUserName(userName);
-//		userRegister.setConfirmPassword(confirmPassword);
-//		userRegister.setEmail(email);
-//		userRegister.setPassword(password);
-		System.out.println(user.getUserName());
-		System.out.println(user.getPassword());
-		System.out.println(user.getEmail());
+	public String addUser(User user,Model model) {
+//		System.out.println(user.getUserName());
+//		System.out.println(user.getPassword());
+//		System.out.println(user.getEmail());
 		boolean usersValid = userValid.isValid(user);
-		
 		if (usersValid == true) {
+			String email = user.getEmail();
+			boolean checkUser = userdao.findUser(email);
+			if (checkUser == true) {
+				userdao.saveUser(user);
+				model.addAttribute("success", "Register Successfully");
+			} else {
+				model.addAttribute("failed", "Email Already Exists");
+			}
 			System.out.println("Register Valid");
-			userdao.saveUser(user);
-			System.out.println(user.getUserName());
 			return "register.jsp";
 		} else {
 			System.out.println("Register Not Valid");
-            return "registerValid.html";
+			model.addAttribute("failed", "Register Not Validated");
+            return "register.jsp";
             
 		}
 		
 	}
 	
 	@GetMapping("/addBook")
-	public String addBooks(Books books) {
-		admindaoImpl.addBooks(books);
+	public String addBooks(Books books,Model model) {
+		boolean booksValid = bookValid.isValid(books);
+		if (booksValid) {
+			admindaoImpl.addBooks(books);
+			model.addAttribute("bookAdd", "Books Added");
+		} else {
+			model.addAttribute("bookNotAdd", "Books Not Added");
+		}
+
 		return "admin/add_books.jsp";
 	}
 	
 	@GetMapping("/log")
-	public String login(User user) {
+	public String login(@RequestParam("email") String email,@RequestParam("password") String password,Model model) {
 		String adminEmail ="ahamednoorullah@gmail.com";
 		String adminPassword = "12345678";
-		String email=user.getEmail();
-		String password = user.getPassword();
-		System.out.println(email);
-		System.out.println(password);
+//		System.out.println(email);
+//		System.out.println(password);
+		User user =new User();
 		if (email.contentEquals(adminEmail) && password.contentEquals(adminPassword)) {
+			model.addAttribute("userobj", user);
 			return "adminHome.jsp";
 		} else {
-            return "redirect:home";
+			user = userdao.login(email, password);
+//			System.out.println("user login ..."+user);
+			if (user != null) {
+				List<Books> newBooks = userdao.newBook();
+				List<Books> comicsBooks = userdao.comicsBook();
+				List<Books> historicalBooks = userdao.historicalBook();
+//				System.out.println(newBooks);
+				model.addAttribute("newBook", newBooks);
+				model.addAttribute("comicsBook", comicsBooks);
+				model.addAttribute("historicalBook", historicalBooks);
+				model.addAttribute("userobj", user);
+				return "userHome.jsp";
+			} else {
+                model.addAttribute("failedMsg", "Email or Password Invalid");
+                return "login.jsp";
+			}
 		}
 	}
 	
 	@GetMapping("/allBooks")
 	public String allBooks(Model model) {
 		List<Books> books = admindaoImpl.bookList();
-		System.out.println(books);
+//		System.out.println(books);
 		model.addAttribute("book_list", books);
 		return "admin/all_books.jsp";
 	}
@@ -107,12 +152,12 @@ public class UserController {
 	public String updateBook(@RequestParam("id") int id,Model model) {
 		Books books = admindaoImpl.findone(id);
 		model.addAttribute("bookFound", books);
-		System.out.println("bookFound.."+books);
+//		System.out.println("bookFound.."+books);
 		return "admin/edit_books.jsp";
 	}
 	@GetMapping("/updateBookData")
 	public String updateBooksData(Books books,Model model) {
-		System.out.println("updateBook.."+books.getBookName());
+//		System.out.println("updateBook.."+books.getBookName());
 		int updateRows = admindaoImpl.update(books);
         Model addAttribute = model.addAttribute(updateRows);
         model.addAttribute("updateBook",books);
@@ -126,48 +171,187 @@ public class UserController {
         model.addAttribute("deleteBook",books);
 		return "redirect:allBooks";
 	}
-//	@GetMapping("/listusers")
-//	public String getAllUsers(Model model) {
-//		List<User> users = userRegisterdao.userList();
-//		System.out.println(users);
-//		model.addAttribute("USER_LIST", users);
-//		return "listusers.jsp";
-//	}
-//	@GetMapping("/findbyuser")
-//	public String findOneUser(@RequestParam("email") String email,Model model) {
-//		User user = userRegisterdao.findOne(email);
-//		System.out.println("User OneRecord Found :"+user);
-//		model.addAttribute("userFound", user);
-//		return "findbyuser.jsp";
-//	}
-//	
-//	@GetMapping("/updateuser")
-//	public String update(@RequestParam("email") String email,Model model) {
-//		User user = userRegisterdao.findOne(email);
-//		System.out.println("User OneRecord Found :"+user);
-//		model.addAttribute("userFound", user);
-//		return "updateuser.jsp";
-//	}
-//	@GetMapping("/updatedata")
-//	public String updateData(@RequestParam("username") String userName,@RequestParam("email") String email,
-//			@RequestParam("password") String password,@RequestParam("cnfpassword") String confimPassword,Model model) {
-//		User user = new User();
-//		user.setUserName(userName);
-//		user.setEmail(email);
-//		user.setPassword(password);
-//		user.setConfirmPassword(confimPassword);
-//		int updateRows = userRegisterdao.update(user);
-//		Model addAttribute = model.addAttribute(updateRows);
-//		model.addAttribute("USER_LIST", user);
-//		return "redirect:listusers";
-//	}
-//	@GetMapping("/deletedata")
-//	public String deleteData(@RequestParam("email") String email,Model model) {
-////		User user = userRegisterdao.findOne(email);
-//		User user = new User();
-//		int deleteRows = userRegisterdao.delete(email);
-//		Model addAttribute = model.addAttribute(deleteRows);
-//		model.addAttribute("USER_LIST", user);
-//		return "redirect:listusers";
-//	}
+
+	@RequestMapping("/newBook")
+	public String newBook(@RequestParam("uid") int userId,Model model) {
+		List<Books> newBooks = userdao.newBook();
+		User user = userdao.findOne(userId);
+		model.addAttribute("newBooks", newBooks);
+		model.addAttribute("userobj", user);
+		return "newBooks.jsp";
+	}
+	
+	@RequestMapping("/comicsBook")
+	public String bestBook(@RequestParam("uid") int userId,Model model) {
+		List<Books> comicsBooks = userdao.comicsBook();
+		User user = userdao.findOne(userId);
+		model.addAttribute("comicsBooks", comicsBooks);
+		model.addAttribute("userobj", user);
+		return "comicsBooks.jsp";
+	}
+	
+	@RequestMapping("/historicalBook")
+	public String kidsBook(@RequestParam("uid") int userId,Model model) {
+		List<Books> historicalBooks = userdao.historicalBook();
+		User user = userdao.findOne(userId);
+		model.addAttribute("historicalBooks", historicalBooks);
+		model.addAttribute("userobj", user);
+		return "historicalBooks.jsp";
+	}
+	
+	@GetMapping("/viewBooks")
+	public String viewBooks(@RequestParam("id") int id,@RequestParam("uid") int uid,Model model) {
+		Books books = admindaoImpl.findone(id);
+		User user = userdao.findOne(uid);
+		model.addAttribute("viewBooks", books);
+		model.addAttribute("userobj", user);
+		return "view_books.jsp";
+	}
+	
+	@GetMapping("/viewUserBooks")
+	public String viewUserBooks(@RequestParam("id") int id,@RequestParam("uid") int uid,Model model) {
+		Books books = admindaoImpl.findone(id);
+		User user = userdao.findOne(uid);
+		model.addAttribute("viewBooks", books);
+		model.addAttribute("userobj", user);
+		return "viewUserBooks.jsp";
+	}
+	@GetMapping("/cart")
+	public String addCart(@RequestParam("bid") int bookId,@RequestParam("uid") int userId,
+			Cart cart,HttpSession session,Model model) {
+		Books books = admindaoImpl.findone(bookId);
+		User user = admindaoImpl.findUser(userId);
+		cart.setBookId(bookId);
+		cart.setUserId(userId);
+		cart.setBookName(books.getBookName());
+		cart.setAuthor(books.getAuthor());
+		cart.setPrice(books.getPrice());
+		cart.setTotalPrice(books.getPrice());
+		boolean f = userdao.addCart(cart);
+		if (f) {
+			System.out.println("Add Cart Success");
+//			session.setAttribute("addCart", "Books Added to Cart");
+			model.addAttribute("addCart", "Books Added to Carting");
+			model.addAttribute("userobj", user);
+			List<Books> newBooks = userdao.newBook();
+			List<Books> comicsBooks = userdao.comicsBook();
+			List<Books> historicalBooks = userdao.historicalBook();
+//			System.out.println(newBooks);
+			model.addAttribute("newBook", newBooks);
+			model.addAttribute("comicsBook", comicsBooks);
+			model.addAttribute("historicalBook", historicalBooks);
+			return "userHome.jsp";
+		} else {
+            System.out.println("Not Added to Cart");
+            session.setAttribute("failed", "Something WEnt Wrong..");
+			return "check.jsp";
+		}
+		
+	}
+	@GetMapping("/cartOut")
+	public String cartDisplay(@RequestParam("uid") int userId,Model model) {
+		List<Cart> cart = userdao.getBooksbyUser(userId);
+		User user = userdao.findOne(userId);
+		System.out.println("cart controller...."+cart);
+		model.addAttribute("cart", cart);
+		model.addAttribute("userobj", user);
+		return "cart.jsp";
+	}
+	@GetMapping("/removeBook")
+	public String removeBooks(@RequestParam("cid") int cartId,@RequestParam("uid") int userId,Model model) {
+		boolean f = userdao.removeBooks(cartId);
+		if (f) {
+			model.addAttribute("successMsg", "Book Removed From Cart");
+			List<Cart> cart = userdao.getBooksbyUser(userId);
+			User user = userdao.findOne(userId);
+			System.out.println("cart controller...."+cart);
+			model.addAttribute("cart", cart);
+			model.addAttribute("userobj", user);
+			return "cart.jsp";
+		} else {
+            model.addAttribute("failedMsg", "Something Went Wrong..");
+            return "check.jsp";
+		}
+		
+	}
+	
+	@GetMapping("/order")
+	public String order(Model model,@RequestParam("name") String name,@RequestParam("email") String email,@RequestParam("phoneNumber") String phoneNumber,
+			@RequestParam("address") String address,@RequestParam("landmark") String landmark,@RequestParam("city") String city,
+			@RequestParam("state") String state,@RequestParam("pincode") String pincode,@RequestParam("payment") String paymentType,@RequestParam("id") int id) {
+		String fullAdd = address+","+landmark+","+city+","+state+","+pincode;
+		
+		System.out.println( name+","+email+","+phoneNumber+","+fullAdd+","+paymentType);
+		List<Cart> blist = userdao.getBooksbyUser(id);
+		User user = userdao.findOne(id);
+		Order order = null;
+		ArrayList<Order> orderList = new ArrayList<>();
+		int i = 1;
+		int qtyUpdate = 0;
+		for (Cart c : blist) {
+			order = new Order();
+			order.setOrderId("BOOK-ORD-00"+i++);
+			order.setUserName(name);
+			order.setEmail(email);
+			order.setPhoneNumber(phoneNumber);
+			order.setFullAdd(fullAdd);
+			order.setBookName(c.getBookName());
+			order.setAuthor(c.getAuthor());
+			order.setPrice(c.getPrice());
+			order.setPaymentType(paymentType);
+			orderList.add(order);
+			Books books = admindaoImpl.findone(c.getBookId());
+			qtyUpdate = books.getQtyInstock();
+			qtyUpdate--;
+			admindaoImpl.bookQtyUpdate(c.getBookName(), qtyUpdate);
+		}
+		if ("noSelect".equals(paymentType)) {
+			return "check.jsp";
+		} else {
+             boolean f = userdao.saveOrder(orderList);
+             if (f) {
+            	 System.out.println("order Success");
+            	 model.addAttribute("userobj", user);
+            	 return "order_success.jsp";
+				
+			}else {
+				System.out.println("order Failed");
+				return "check.jsp";
+				
+			}
+		}
+		}
+	@GetMapping("/userOrder")
+	public String userOrder(@RequestParam("email") String email,Model model) {
+		List<Order> order = userdao.getOrderList(email);
+		System.out.println("userorder .."+order);
+		model.addAttribute("order",order);
+		return "user_order.jsp";
+	}
+	
+	@GetMapping("/allOrders")
+	public String getAllOrder(Model model) {
+		List<Order> order = admindaoImpl.getAllOrderList();
+		model.addAttribute("allOrder", order);
+		return "admin/orders.jsp";
+	}
+	@GetMapping("/searchBook")
+	public String getSearchBook(@RequestParam("ch") String ch,@RequestParam("uid") int id,Model model) {
+		System.out.println("search Character .."+ch);
+		List<Books> books = userdao.getBookBySearch(ch);
+		User user = userdao.findOne(id);
+		model.addAttribute("userobj", user);
+		model.addAttribute("searchBook", books);
+		System.out.println("search Book .. "+books);
+		return "searchBook.jsp";
+	}
+	
+    @GetMapping("/searchHome")  
+	public String getSearchHomePage(@RequestParam("ch") String ch,Model model) {
+		List<Books> books = userdao.getBookBySearch(ch);
+		model.addAttribute("searchBook", books);
+		return "searchBookHomePage.jsp";
+	}
+	
+
 }

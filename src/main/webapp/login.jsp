@@ -15,6 +15,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h3 class="text-center">Login</h3>
+                            
+                                <h5 class="text-center text-danger">${failedMsg}</h5>
+                           
                         <form action="/log" method="get" id="loginForm">
                             <div class="form-group">
                               <label for="exampleInputEmail1">Email address</label>

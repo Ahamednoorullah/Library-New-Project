@@ -1,3 +1,8 @@
+<%@ page import="com.chainsys.library.model.User"%>
+<%@ page import="com.chainsys.library.model.Order"%>
+<%@ page import="java.util.List"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%> 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +13,10 @@
 </head>
 <body>
     <%@include file = "navbar.jsp" %>
+
+    <%
+    List<Order> order =(List<Order>) request.getAttribute("allOrder");
+        %>
     <h2 class="text-center">Hello Admin</h2>
 
     <table class="table table-striped">
@@ -24,42 +33,24 @@
             <th scope="col">Payment Type</th>
           </tr>
         </thead>
+        <% 
+        for(Order orders : order){
+            %>
         <tbody>
           <tr>
-            <th scope="row">1</th>
+            <th scope="row"><%=orders.getOrderId()%></th>
            
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>Mark</td>
-            <td>Otto</td>
+            <td><%=orders.getUserName()%></td>
+            <td><%=orders.getEmail()%></td>
+            <td><%=orders.getFullAdd()%></td>
+            <td><%=orders.getPhoneNumber()%></td>
+            <td><%=orders.getBookName()%></td>
+            <td><%=orders.getAuthor()%></td>
+            <td><%=orders.getPrice()%></td>
+            <td><%=orders.getPaymentType()%></td>
           </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>Jacob</td>
-            <td>Thornton</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td>Larry</td>
-            <td>the Bird</td>
-            <td>@twitter</td>
-            <td>Larry</td>
-            <td>the Bird</td>
-
-          </tr>
+          <%}%>
+         
         </tbody>
       </table>
 </body>

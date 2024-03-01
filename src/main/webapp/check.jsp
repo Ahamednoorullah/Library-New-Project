@@ -12,8 +12,7 @@
 <body>
     <h2>Hello Admin</h2>
     
-    <%List<Books> book =(List<Books>) request.getAttribute("book_list");
-        out.println(book); %>
+   <h3>${addCart}</h3> 
 
 </body>
 </html>

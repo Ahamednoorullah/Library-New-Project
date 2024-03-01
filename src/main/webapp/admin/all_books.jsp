@@ -12,7 +12,7 @@
 </head>
 <body>
     <%@include file = "navbar.jsp" %>
-    <h2 class="text-center">Hello Admin</h2>
+    <h2 class="text-center">Hello Ahamed</h2>
     
     <%
     List<Books> book =(List<Books>) request.getAttribute("book_list");
@@ -45,8 +45,8 @@
             <td><%=books.getStatus()%></td>
             <td><%=books.getPublishedYear()%></td>
             <td><%=books.getQtyInstock()%></td>
-            <td><a href="/updateBooks?id=<%=books.getBookId() %>" class="btn btn-sm btn-primary">Edit</a>
-            <a href="/deleteBook?id=<%=books.getBookId() %>" class="btn btn-sm btn-danger">Delete</a></td>
+            <td><a href="/updateBooks?id=<%=books.getBookId() %>" class="btn btn-sm btn-primary"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+            <a href="/deleteBook?id=<%=books.getBookId() %>" class="btn btn-sm btn-danger"><i class="fa-solid fa-trash-can"></i> Delete</a></td>
           </tr>
           <%}%>
          

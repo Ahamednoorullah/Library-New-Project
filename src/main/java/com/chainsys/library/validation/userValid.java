@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 import com.chainsys.library.model.User;
 
-public class userValid {
+public class UserValid {
 
 	public boolean isValid(User user) {
 		//get User Details

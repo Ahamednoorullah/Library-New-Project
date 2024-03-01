@@ -8,7 +8,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.chainsys.library.mapper.BookMapper;
+import com.chainsys.library.mapper.OrderMapper;
+import com.chainsys.library.mapper.UserMapper;
 import com.chainsys.library.model.Books;
+import com.chainsys.library.model.Order;
+import com.chainsys.library.model.User;
 
 @Repository
 public class AdminDaoImpl implements AdminDao {
@@ -38,7 +42,7 @@ public class AdminDaoImpl implements AdminDao {
 	public int update(Books books) {
 		String sqlQuery = "update ebook.book_details set book_name=?,author=?,price=?,book_category=?,status=?,published_year=?,qty_instock=?,photo=? where book_id=?";
 		Object[] params = {books.getBookName(),books.getAuthor(),books.getPrice(),books.getBookCategory(),books.getStatus(),books.getPublishedYear(),books.getQtyInstock(),books.getPhotoName(),books.getBookId()};
-		System.out.println("dao update.."+books.getBookName()+","+books.getQtyInstock()+","+books.getBookId());
+		//System.out.println("dao update.."+books.getBookName()+","+books.getQtyInstock()+","+books.getBookId());
 		int noOfRow = jdbcTemplate.update(sqlQuery, params);
 		return noOfRow;
 	}
@@ -47,6 +51,27 @@ public class AdminDaoImpl implements AdminDao {
 		String sqlQuery = "delete from ebook.book_details where book_id='"+id+"'";
 		int noOfRows = jdbcTemplate.update(sqlQuery);
 		return noOfRows;
+	}
+	@Override
+	public User findUser(int userId) {
+		String sqlQuery = "select * from ebook.user where id = ?";
+	User oneRecord = jdbcTemplate.queryForObject(sqlQuery,new UserMapper(),userId);
+		return oneRecord;
+	
+	}
+	@Override
+	public List<Order> getAllOrderList() {
+		List<Order> order = null;
+		String sqlQuery = "select * from ebook.book_order";
+		order = jdbcTemplate.query(sqlQuery, new OrderMapper());
+		return order;
+
+	}
+	@Override
+	public int bookQtyUpdate(String bookName,int qtyUpdate) {
+		String sqlQuery = "update ebook.book_details set qty_instock='"+qtyUpdate+"' where book_name='"+bookName+"'";
+		int noOfRow = jdbcTemplate.update(sqlQuery);
+		return noOfRow;
 	}
 	
 

@@ -1,4 +1,5 @@
 <%@ page import="com.chainsys.library.model.Books"%>
+<%@ page import="com.chainsys.library.model.User"%>
 <%@ page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%> 
@@ -12,7 +13,7 @@
     <style type="text/css">
 
         .back-img{
-            background: url("book/book.jpg");
+            background: url("book/bookUser.jpg");
             height: 55vh;
             width: 100%;
             background-repeat: no-repeat;
@@ -22,10 +23,68 @@
         .crd-ho:hover{
             background-color: #edede8;
         }
+        
+#toast{
+	min-width: 300px;
+	position: fixed;
+	bottom: 30px;
+	left: 50%;
+	margin-left: -125px;
+	background: white;
+	padding: 10px;
+	color: black;
+	text-align: center;
+	z-index: 1;
+	font-size: 18px;
+	visibility: hidden;
+	box-shadow: 0px 0px 100px #000;
+}
+
+#toast.display{
+	visibility: visible;
+	animation: ease-in 0.5,ease-out 0.5s 2.5s;
+}
+
+@keyframes fadeIn{from { 
+	bottom:0;
+    opacity:0
+    }
+to{
+	bottom: 30px;
+	opacity: 1;
+}
+
+}
+@keyframes fadeOut{from { 
+	bottom:30px;
+    opacity:1;
+    }
+to{
+	bottom: 0;
+	opacity: 0;
+}
+
+}
     </style>
 </head>
 <body style="background-color: #f7f7f7;">
-    <%@include file ="all_components/navbar.jsp"%>
+
+
+
+    <%@include file ="user/navbar.jsp"%>
+
+    <div id="toast">${addCart}</div>
+
+    <script type="text/javascript">
+        showToast();
+        function showToast(content){
+            $('#toast').addClass("display");
+            $('#toast').html(content);
+            setTimeout(()=>{
+                $("#toast").removeClass("display");
+            },2000)
+        }
+    </script>
 
     <div class="container-fluid back-img">
 
@@ -36,6 +95,9 @@
     List<Books> newBooks =(List<Books>) request.getAttribute("newBook");
         %>
 
+        <!-- <%
+        User users =(User) request.getAttribute("userobj");
+            %> -->
     <!-- Start new arrival --> 
     <div class="container">
         <h3 class="text-center">New Arrival</h3>
@@ -52,8 +114,8 @@
                 <p><%=books.getAuthor()%></p>
                 <p><%=books.getBookCategory()%></p>
                 <div class="row text-center">
-                    <!-- <a href="login.jsp" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a> -->
-                    <a href="login.jsp" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="/cart?bid=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a>
+                    <a href="/viewUserBooks?id=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-primary btn-sm ml-1">$<%=books.getPrice()%></a>
                 </div>
             </div>
@@ -71,7 +133,7 @@
     </div>
 
    <div class="text-center mt-1">
-    <a href="login.jsp" class="btn btn-danger btn-sm text-white">View All</a>
+    <a href="/newBook?uid=${userobj.id}" class="btn btn-danger btn-sm text-white">View All</a>
    </div>
     </div>
     
@@ -97,8 +159,8 @@
                 <p><%=books.getAuthor()%></p>
                 <p><%=books.getBookCategory()%></p>
                 <div class="row text-center">
-                    <!-- <a href="login.jsp" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a> -->
-                    <a href="login.jsp" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="/cart?bid=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a>
+                    <a href="/viewUserBooks?id=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-primary btn-sm ml-1">$<%=books.getPrice()%></a>
                 </div>
             </div>
@@ -116,7 +178,7 @@
     </div>
 
    <div class="text-center mt-1">
-    <a href="login.jsp" class="btn btn-danger btn-sm text-white">View All</a>
+    <a href="/comicsBook?uid=${userobj.id}" class="btn btn-danger btn-sm text-white">View All</a>
    </div>
     </div>
     
@@ -142,18 +204,19 @@
                 <p><%=books.getAuthor()%></p>
                 <p><%=books.getBookCategory()%></p>
                 <div class="row text-center">
-                    <!-- <a href="login.jsp" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a> -->
-                    <a href="login.jsp" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="/cart?bid=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-danger btn-sm"><i class="fa-solid fa-cart-shopping"></i> Add Cart</a>
+                    <a href="/viewUserBooks?id=<%=books.getBookId() %>&&uid=${userobj.id}" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-primary btn-sm ml-1">$<%=books.getPrice()%></a>
                 </div>
             </div>
            </div>
         </div>
-         <% countHistoricalBook++;
+        <% countHistoricalBook++;
         if(countHistoricalBook == 5){
             break;
         }
      } %>
+
 
        
 
@@ -161,7 +224,7 @@
     </div>
 
    <div class="text-center mt-1">
-    <a href="login.jsp" class="btn btn-danger btn-sm text-white">View All</a>
+    <a href="/historicalBook?uid=${userobj.id}" class="btn btn-danger btn-sm text-white">View All</a>
    </div>
     </div>
     
