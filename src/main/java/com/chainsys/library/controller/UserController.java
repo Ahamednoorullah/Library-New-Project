@@ -39,21 +39,22 @@ public class UserController {
 	
 	
 	UserValid userValid = new UserValid();
-	
-
 	BookValid bookValid = new BookValid();
+	
+	
+	// Home Page
 	@RequestMapping("/home")
 	public String home(Model model) {
 		List<Books> newBooks = userdao.newBook();
 		List<Books> comicsBooks = userdao.comicsBook();
 		List<Books> historicalBooks = userdao.historicalBook();
-//		System.out.println(newBooks);
 		model.addAttribute("newBook", newBooks);
 		model.addAttribute("comicsBook", comicsBooks);
 		model.addAttribute("historicalBook", historicalBooks);
 		return  "index.jsp";
 	}
 	
+	// user Home Page
 	@RequestMapping("/userHome")
 	public String userHome(Model model,@RequestParam("uid") int id) {
 		User user = userdao.findOne(id);
@@ -61,21 +62,21 @@ public class UserController {
 		List<Books> newBooks = userdao.newBook();
 		List<Books> comicsBooks = userdao.comicsBook();
 		List<Books> historicalBooks = userdao.historicalBook();
-//		System.out.println(newBooks);
 		model.addAttribute("newBook", newBooks);
 		model.addAttribute("comicsBook", comicsBooks);
 		model.addAttribute("historicalBook", historicalBooks);
 		return  "userHome.jsp";
 	}
+	
+	//Register Page
 	@RequestMapping("/reg")
 	public String register() {
 		return "register.html";
 	}
 	
+	//User Register Added
 	@GetMapping("/addUser")
 	public String addUser(User user,Model model) {
-//		System.out.println(user.getUserName());
-//		System.out.println(user.getPassword());
 //		System.out.println(user.getEmail());
 		boolean usersValid = userValid.isValid(user);
 		if (usersValid == true) {
@@ -98,6 +99,7 @@ public class UserController {
 		
 	}
 	
+	// Admin books added
 	@GetMapping("/addBook")
 	public String addBooks(Books books,Model model) {
 		boolean booksValid = bookValid.isValid(books);
@@ -111,6 +113,7 @@ public class UserController {
 		return "admin/add_books.jsp";
 	}
 	
+	//login Page
 	@GetMapping("/log")
 	public String login(@RequestParam("email") String email,@RequestParam("password") String password,Model model) {
 		String adminEmail ="ahamednoorullah@gmail.com";
@@ -123,12 +126,10 @@ public class UserController {
 			return "adminHome.jsp";
 		} else {
 			user = userdao.login(email, password);
-//			System.out.println("user login ..."+user);
 			if (user != null) {
 				List<Books> newBooks = userdao.newBook();
 				List<Books> comicsBooks = userdao.comicsBook();
 				List<Books> historicalBooks = userdao.historicalBook();
-//				System.out.println(newBooks);
 				model.addAttribute("newBook", newBooks);
 				model.addAttribute("comicsBook", comicsBooks);
 				model.addAttribute("historicalBook", historicalBooks);
@@ -141,20 +142,23 @@ public class UserController {
 		}
 	}
 	
+	//Admin All Books Viewed
 	@GetMapping("/allBooks")
 	public String allBooks(Model model) {
 		List<Books> books = admindaoImpl.bookList();
-//		System.out.println(books);
 		model.addAttribute("book_list", books);
 		return "admin/all_books.jsp";
 	}
+	
+	//Admin Books Edited Page
 	@GetMapping("/updateBooks")
 	public String updateBook(@RequestParam("id") int id,Model model) {
 		Books books = admindaoImpl.findone(id);
 		model.addAttribute("bookFound", books);
-//		System.out.println("bookFound.."+books);
 		return "admin/edit_books.jsp";
 	}
+	
+	// Admin Books Edited ViewPage
 	@GetMapping("/updateBookData")
 	public String updateBooksData(Books books,Model model) {
 //		System.out.println("updateBook.."+books.getBookName());
@@ -163,6 +167,8 @@ public class UserController {
         model.addAttribute("updateBook",books);
 		return "redirect:allBooks";
 	}
+	
+	//Admin Book Deleted Process 
 	@GetMapping("/deleteBook")
 	public String deleteBook(@RequestParam("id") int id,Model model) {
 		Books books= new Books();
@@ -172,6 +178,7 @@ public class UserController {
 		return "redirect:allBooks";
 	}
 
+	//User NewBooks ViewPage
 	@RequestMapping("/newBook")
 	public String newBook(@RequestParam("uid") int userId,Model model) {
 		List<Books> newBooks = userdao.newBook();
@@ -181,6 +188,7 @@ public class UserController {
 		return "newBooks.jsp";
 	}
 	
+	//User ComicsBooks ViewPage
 	@RequestMapping("/comicsBook")
 	public String bestBook(@RequestParam("uid") int userId,Model model) {
 		List<Books> comicsBooks = userdao.comicsBook();
@@ -190,6 +198,7 @@ public class UserController {
 		return "comicsBooks.jsp";
 	}
 	
+	//User HistoricalBooks ViewPage
 	@RequestMapping("/historicalBook")
 	public String kidsBook(@RequestParam("uid") int userId,Model model) {
 		List<Books> historicalBooks = userdao.historicalBook();
@@ -199,6 +208,7 @@ public class UserController {
 		return "historicalBooks.jsp";
 	}
 	
+	//User(without login) SelectedBook View Page
 	@GetMapping("/viewBooks")
 	public String viewBooks(@RequestParam("id") int id,@RequestParam("uid") int uid,Model model) {
 		Books books = admindaoImpl.findone(id);
@@ -208,6 +218,7 @@ public class UserController {
 		return "view_books.jsp";
 	}
 	
+	//User SelectedBook View Page
 	@GetMapping("/viewUserBooks")
 	public String viewUserBooks(@RequestParam("id") int id,@RequestParam("uid") int uid,Model model) {
 		Books books = admindaoImpl.findone(id);
@@ -216,6 +227,8 @@ public class UserController {
 		model.addAttribute("userobj", user);
 		return "viewUserBooks.jsp";
 	}
+	
+	//User Cart Added Process
 	@GetMapping("/cart")
 	public String addCart(@RequestParam("bid") int bookId,@RequestParam("uid") int userId,
 			Cart cart,HttpSession session,Model model) {
@@ -248,6 +261,8 @@ public class UserController {
 		}
 		
 	}
+	
+	//User Cart View Page
 	@GetMapping("/cartOut")
 	public String cartDisplay(@RequestParam("uid") int userId,Model model) {
 		List<Cart> cart = userdao.getBooksbyUser(userId);
@@ -257,6 +272,8 @@ public class UserController {
 		model.addAttribute("userobj", user);
 		return "cart.jsp";
 	}
+	
+	//User Cart remove Book Process
 	@GetMapping("/removeBook")
 	public String removeBooks(@RequestParam("cid") int cartId,@RequestParam("uid") int userId,Model model) {
 		boolean f = userdao.removeBooks(cartId);
@@ -275,6 +292,7 @@ public class UserController {
 		
 	}
 	
+	//User Order Process
 	@GetMapping("/order")
 	public String order(Model model,@RequestParam("name") String name,@RequestParam("email") String email,@RequestParam("phoneNumber") String phoneNumber,
 			@RequestParam("address") String address,@RequestParam("landmark") String landmark,@RequestParam("city") String city,
@@ -321,6 +339,8 @@ public class UserController {
 			}
 		}
 		}
+	
+	//User Order View Page
 	@GetMapping("/userOrder")
 	public String userOrder(@RequestParam("email") String email,Model model) {
 		List<Order> order = userdao.getOrderList(email);
@@ -329,12 +349,15 @@ public class UserController {
 		return "user_order.jsp";
 	}
 	
+	//Admin All Orders View Page
 	@GetMapping("/allOrders")
 	public String getAllOrder(Model model) {
 		List<Order> order = admindaoImpl.getAllOrderList();
 		model.addAttribute("allOrder", order);
 		return "admin/orders.jsp";
 	}
+	
+	//User Search Book Process
 	@GetMapping("/searchBook")
 	public String getSearchBook(@RequestParam("ch") String ch,@RequestParam("uid") int id,Model model) {
 		System.out.println("search Character .."+ch);
@@ -346,6 +369,7 @@ public class UserController {
 		return "searchBook.jsp";
 	}
 	
+	//User(Without login) Search Book Process
     @GetMapping("/searchHome")  
 	public String getSearchHomePage(@RequestParam("ch") String ch,Model model) {
 		List<Books> books = userdao.getBookBySearch(ch);

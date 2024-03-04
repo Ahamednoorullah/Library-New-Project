@@ -24,72 +24,120 @@ public class UserDaoImpl implements UserDao  {
 	@Autowired
 	JdbcTemplate jdbcTemplate;
 	
+	
+	//User RegisterForm Added
 	public void saveUser(User userRegister) {
-		String password = userRegister.getPassword();
-		//BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		//String encoderPassword = encoder.encode(password);
-		//System.out.println(encoderPassword);
-		String sqlQuery = "INSERT INTO ebook.user (name,email,phone_no, password) VALUES (?,?,?,?)";
-		Object[] params = {userRegister.getUserName(),userRegister.getEmail(),userRegister.getPhoneNumber(),password};
-		jdbcTemplate.update(sqlQuery,params);
+		try {
+			String password = userRegister.getPassword();
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			String encoderPassword = encoder.encode(password);
+			//System.out.println(encoderPassword);
+			String sqlQuery = "INSERT INTO ebook.user (name,email,phone_no, password) VALUES (?,?,?,?)";
+			Object[] params = {userRegister.getUserName(),userRegister.getEmail(),userRegister.getPhoneNumber(),encoderPassword};
+			jdbcTemplate.update(sqlQuery,params);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("There is Some SQL Error in Adding User");
+		}
+		
 	}
 
+	
+	//Bringing all new Books
 	@Override
 	public List<Books> newBook() {
-		String sqlQuery = "select * from ebook.book_details where book_category='NewArrival'";
-		List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
-		return bookList;
+		try {
+			String sqlQuery = "select * from ebook.book_details where book_category='NewArrival'";
+			List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
+			return bookList;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("There is Some SQL Error in bringing NewBook List");
+		    return null;
+		}
+		
 	}
 
+	//Bringing all Comics Books
 	@Override
 	public List<Books> comicsBook() {
-		String sqlQuery = "select * from ebook.book_details where book_category='comics'";
-		List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
-		return bookList;
+		try {
+			String sqlQuery = "select * from ebook.book_details where book_category='comics'";
+			List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
+			return bookList;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("There is Some SQL Error in bringing ComicsBook List");
+		    return null;
+		}
+		
 	}
 
+	//Bringing all Historical Books
 	@Override
 	public List<Books> historicalBook() {
-		String sqlQuery = "select * from ebook.book_details where book_category='historical'";
-		List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
-		return bookList;
-	}
+		try {
+			String sqlQuery = "select * from ebook.book_details where book_category='historical'";
+			List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
+			return bookList;
 
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("There is Some SQL Error in bringing HistoricalBook List");
+			return null;
+		}
+			}
+
+	//User Login Process
 	@Override
 	public User login(String email, String password) {
 		User user = null;
 		try {
 			String sqlQuery = "select * from ebook.user where email=? and password=?";
-//			System.out.println("dao....."+email);
-//			System.out.println("dao......"+password);
 			 user = jdbcTemplate.queryForObject(sqlQuery, new UserMapper(),email,password);
-//			System.out.println("dao user ..."+user);
 			 return user;
 		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Sql Error in Login Page");
 			return user;
 		}
 		
 	}
 
+	//User Cart Added
 	@Override
 	public boolean addCart(Cart cart) {
 		boolean f = false;
-		String sqlQuery = "INSERT INTO ebook.cart (book_id,user_id,book_name, author,price,total_price) VALUES (?,?,?,?,?,?)";
-		Object[] params = {cart.getBookId(),cart.getUserId(),cart.getBookName(),cart.getAuthor(),cart.getPrice(),cart.getTotalPrice()};
-		int noOfRow = jdbcTemplate.update(sqlQuery, params);
-		if (noOfRow == 1) {
-			f = true;
-		} 
+		try {
+			String sqlQuery = "INSERT INTO ebook.cart (book_id,user_id,book_name, author,price,total_price) VALUES (?,?,?,?,?,?)";
+			Object[] params = {cart.getBookId(),cart.getUserId(),cart.getBookName(),cart.getAuthor(),cart.getPrice(),cart.getTotalPrice()};
+			int noOfRow = jdbcTemplate.update(sqlQuery, params);
+			if (noOfRow == 1) {
+				f = true;
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Cart Added Error in SQL");
+		}
+		
 		return f;
 	}
 
+	//Bringing user All CartList
 	@Override
 	public List<Cart> getBooksbyUser(int userId) {
 		List<Cart> cart = null;
-		String sqlQuery = "select * from ebook.cart where user_id=?";
-		cart = jdbcTemplate.query(sqlQuery, new CartMapper(),userId);
-		System.out.println("cart dao...."+cart);
-		return cart;
+		try {
+			String sqlQuery = "select * from ebook.cart where user_id=?";
+			cart = jdbcTemplate.query(sqlQuery, new CartMapper(),userId);
+			System.out.println("cart dao...."+cart);
+			return cart;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("There is Some SQL Error in Bringing All CartList");
+		     return cart;
+		}
+		
 	}
 
 //	@Override
@@ -98,14 +146,21 @@ public class UserDaoImpl implements UserDao  {
 //		List<User> usersList = jdbcTemplate.query(sqlQuery,new UserMapper() );
 //		return usersList;
 //	}
-//
+
+	//Bringing find one User
 	@Override
 	public User findOne(int userId) {
-		String sqlQuery = "select * from ebook.user where id = ?";
-		User oneRecord = jdbcTemplate.queryForObject(sqlQuery,new UserMapper(),userId);
-		System.out.println("Finding one record : "+oneRecord);
-		
-		return oneRecord;
+		try {
+			String sqlQuery = "select * from ebook.user where id = ?";
+			User oneRecord = jdbcTemplate.queryForObject(sqlQuery,new UserMapper(),userId);
+			System.out.println("Finding one record : "+oneRecord);
+			
+			return oneRecord;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Findind one User Record Error in SQL Statement");
+		    return null;
+		}
 	}
 //
 //	@Override
@@ -123,6 +178,7 @@ public class UserDaoImpl implements UserDao  {
 //		return noOfRows;
 //	}
 
+	//Remove Cart Items
 	@Override
 	public boolean removeBooks(int cartId) {
 		boolean f = false;
@@ -136,12 +192,12 @@ public class UserDaoImpl implements UserDao  {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.out.println("Remove Cart Items Error In SQL Statement");
 		}
-		System.out.println("books remove cart bid="+cartId);
-		System.out.println("books remove cart f boolean="+f);
 				return f;
 	}
 
+	//User OrderList Saved
 	@Override
 	public boolean saveOrder(List<Order> olist) {
 		boolean f =false;
@@ -156,36 +212,53 @@ public class UserDaoImpl implements UserDao  {
 		return f;
 	}
 
+	//Bringing All OrderList Items
 	@Override
 	public List<Order> getOrderList(String email) {
 		List<Order> order = null;
-		String sqlQuery = "select * from ebook.book_order where email=?";
-		order = jdbcTemplate.query(sqlQuery, new OrderMapper(),email);
-		//System.out.println("order dao...."+order);
-		return order;
+		try {
+			String sqlQuery = "select * from ebook.book_order where email=?";
+			order = jdbcTemplate.query(sqlQuery, new OrderMapper(),email);
+			return order;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Order ALL list Error in SQL Statement");
+			return order;
+		}
 	
 	}
 
+	//Bringing Search Book List
 	@Override
 	public List<Books> getBookBySearch(String ch) {
-		String sqlQuery = "select * from ebook.book_details where book_name like '%"+ch+"%' or author like '%"+ch+"%' or book_category like '%"+ch+"%' and status ='Active'";
-		List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
-		System.out.println("search booklist" +bookList);
-		return bookList;
+		try {
+			String sqlQuery = "select * from ebook.book_details where book_name like '%"+ch+"%' or author like '%"+ch+"%' or book_category like '%"+ch+"%' and status ='Active'";
+			List<Books> bookList = jdbcTemplate.query(sqlQuery, new BookMapper());
+			return bookList;
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Search List Error in SQL statement");
+			return null;
+		}
 
 	}
 
+	//Bringing find one User from userlist
 	@Override
 	public boolean findUser(String email) {
 		boolean fo =false;
-		List<User>  user = null;
-		String sqlQuery = "select * from ebook.user where email = '"+email+"'";
-		 user = jdbcTemplate.query(sqlQuery, new UserMapper());
-		System.out.println("Finding one record : "+user);
-		if (user.isEmpty() ) {
-			fo =true;
-		} 
-		System.out.println("f.."+fo);
+		try {
+			List<User>  user = null;
+			String sqlQuery = "select * from ebook.user where email = '"+email+"'";
+			 user = jdbcTemplate.query(sqlQuery, new UserMapper());
+			if (user.isEmpty() ) {
+				fo =true;
+			} 
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Finding one User ERROR In SQL Statement");
+			
+		}
 		return fo;
 	}
 }
